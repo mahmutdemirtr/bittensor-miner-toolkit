@@ -1,0 +1,17 @@
+# terraform.tfvars.example
+# Usage: cp terraform.tfvars.example terraform.tfvars
+# Then enter only your wallet information
+
+# Subnet settings (default: Subnet 1 - Apex)
+# To use another subnet, change to: 3, 8, 18, 21, etc.
+subnet_id = 1
+
+# Wallet information (ONLY FILL THESE)
+wallet_name = "my_wallet"
+wallet_coldkey_mnemonic = "word1 word2 word3 ... word12"
+wallet_hotkey_mnemonic = "word1 word2 word3 ... word12"
+
+# Automatic settings (do not change)
+wallet_mode = "import"
+miner_script_url = ""
+enable_monitoring = true
