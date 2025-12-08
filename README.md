@@ -155,10 +155,13 @@ terraform apply -auto-approve    # Apply changes
 - Subnet 18: 500,000 TAO burn cost
 - Subnet 21: 10,000,000 TAO burn cost
 
-### Profitability Analysis
+### Profitability Analysis & Auto-Switch
 ```bash
 # Find most profitable subnet
-./scripts/profitability_scanner.py --subnets 1,18,21
+python3 ./scripts/profitability_scanner.py --subnets 1,18,21
+
+# Auto-switch to most profitable subnet
+python3 ./scripts/profitability_scanner.py --subnets 1,3,8,18,21 --auto-switch
 ```
 
 ---
@@ -185,84 +188,19 @@ python -m bittensor wallet overview --wallet.name your_wallet_name
 
 ---
 
-## Help and Documentation
+## Notes
 
-- **Apex Docs:** https://docs.macrocosmos.ai/subnets/new-subnet-1-apex
-- **GitHub:** https://github.com/macrocosm-os/prompting
-- **Bittensor:** https://docs.bittensor.com
+### Supported Subnets with Automated Terraform Setup
 
----
+This toolkit provides **full automated setup** for the following subnets:
 
-## Troubleshooting
-
-### Terraform Errors
-
-#### "Missing false expression in conditional" (main.tf)
-**Cause:** Heredoc strings in ternary operators need to be wrapped
-
-**Solution:**
-```bash
-# Already fixed in main.tf - if you see this error, pull latest code
-git pull origin main
-# Or manually wrap heredocs with chomp():
-# value = var.subnet_id == 1 ? chomp(<<-EOT ... EOT) : chomp(<<-EOT ... EOT)
-```
-
-#### "crontab: command not found" (setup_cron.sh)
-**Cause:** Crontab not available in container environment
-
-**Solution:**
-```bash
-# Already fixed in scripts/setup_cron.sh - script handles missing crontab gracefully
-# To run health monitor manually:
-python3 /workspace/bittensor-miner-toolkit/scripts/health_monitor.py \
-  --subnet-id 1 \
-  --wallet-name your_wallet_name \
-  --interval 300 &
-```
-
-#### General terraform errors
-```bash
-# Start over
-terraform destroy
-terraform init
-terraform apply -auto-approve
-```
-
-### Apex CLI Errors
-
-#### "apex: command not found"
-```bash
-export PATH="/root/.local/bin:$PATH"
-echo 'export PATH="/root/.local/bin:$PATH"' >> ~/.bashrc
-```
-
-#### "No .apex.config.json file"
-```bash
-cd /workspace/prompting
-cat > .apex.config.json << EOF
-{
-  "hotkey_file_path": "/workspace/.bittensor/wallets/your_wallet/hotkeys/default",
-  "timeout": 60.0
-}
-EOF
-```
-
-### Wallet Errors
-
-#### Wallet not registered
-```bash
-source /workspace/bittensor-venv/bin/activate
-python -m bittensor subnet register --netuid 1 --wallet.name your_wallet_name
-```
-
-#### "FileExistsError: ~/.bittensor"
-```bash
-# Remove and recreate as symlink
-rm -f ~/.bittensor
-mkdir -p /workspace/.bittensor/wallets
-ln -sf /workspace/.bittensor ~/.bittensor
-```
+| Subnet ID | Name | Type | Setup Script | Mining Method |
+|-----------|------|------|--------------|---------------|
+| **1** | Text Prompting (Apex) | Competition-based | `subnet_1_setup.sh` | Apex CLI (apex submit) |
+| **3** | Data Vending | Traditional Miner | `subnet_3_setup.sh` | neurons/miner.py |
+| **8** | Taoshi | Financial Prediction | `subnet_8_setup.sh` | neurons/miner.py |
+| **18** | Cortex.t | LLM | `subnet_18_setup.sh` | neurons/miner.py |
+| **21** | FileTAO | Storage | `subnet_21_setup.sh` | neurons/miner.py |
 
 ---
 
